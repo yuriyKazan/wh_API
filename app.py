@@ -19,6 +19,7 @@ if uri and uri.startswith("postgres://"):
     os.environ["DATABASE_URL"] = uri.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
+print(f'The application uses us database {app.config["SQLALCHEMY_DATABASE_URI"]}')
 app.config['JWT_AUTH_URL_RULE'] = '/login'
 app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=600)
 app.config['PROPAGATE_EXCEPTIONS'] = True  # To allow flask propagating exception even if debug is set to false on app
