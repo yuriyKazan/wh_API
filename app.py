@@ -12,6 +12,12 @@ from resources.store import Store, StoreList
 from security import authenticate, identity
 
 app = Flask(__name__)
+# workaround https://help.heroku.com/ZKNTJQSK/why-is-sqlalchemy-1-4-x-not-connecting-to-heroku-postgres
+uri = os.getenv("DATABASE_URL")
+os.environ["DEBUSSY"] = "1"
+if uri and uri.startswith("postgres://"):
+    os.environ["DATABASE_URL"] = uri.replace("postgres://", "postgresql://", 1)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
 app.config['JWT_AUTH_URL_RULE'] = '/login'
 app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=600)
