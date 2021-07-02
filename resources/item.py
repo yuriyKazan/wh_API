@@ -58,8 +58,6 @@ class Item(Resource):
             item.price = data['price']
             if data['quantity']:
                 item.quantity = data['quantity']
-            else:
-                item.quantity = 0
         item.save_to_db()
         return item.json()
 
