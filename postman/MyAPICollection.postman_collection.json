@@ -9,25 +9,75 @@
 			"name": "PMScripts",
 			"item": [
 				{
-					"name": "items",
+					"name": "/register",
 					"request": {
-						"method": "GET",
-						"header": [],
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"ykazan\",\r\n    \"password\": \"asdf\"\r\n}"
+						},
 						"url": {
-							"raw": "{{url}}/items",
+							"raw": "{{url}}/register",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"items"
+								"register"
 							]
-						},
-						"description": "Return a list of items in JSON format"
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "/item/<name>",
+					"name": "/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"tests[\"access_token is present\"] = jsonData.access_token !== undefined;\r",
+									"\r",
+									"pm.environment.set(\"jwt_token\", jsonData.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"ykazan\",\r\n    \"password\": \"asdf\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/stores/",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -38,13 +88,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/item/<name>",
+							"raw": "{{url}}/stores",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"item",
-								"<name>"
+								"stores"
 							]
 						},
 						"description": "Return one specific item, uniquely identified by it's name"
@@ -53,31 +102,22 @@
 				},
 				{
 					"name": "/store/<name>",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "JWT {{jwt_token}}",
-								"type": "text"
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"tests[\"store id is present\"] = jsonData.id !== undefined;\r",
+									"tests[\"store name is present\"] = jsonData.name !== undefined;\r",
+									"\r",
+									"pm.environment.set(\"store_id\", jsonData.id);\r",
+									"pm.environment.set(\"store_name\", jsonData.name);"
+								],
+								"type": "text/javascript"
 							}
-						],
-						"url": {
-							"raw": "{{url}}/store/<name>",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"store",
-								"<name>"
-							]
-						},
-						"description": "Return one specific item, uniquely identified by it's name"
-					},
-					"response": []
-				},
-				{
-					"name": "/store/<name>",
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -88,38 +128,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/store/<name>",
+							"raw": "{{url}}/store/mystore",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"store",
-								"<name>"
-							]
-						},
-						"description": "Return one specific item, uniquely identified by it's name"
-					},
-					"response": []
-				},
-				{
-					"name": "/store/<name>",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "JWT {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/store/<name>",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"store",
-								"<name>"
+								"mystore"
 							]
 						},
 						"description": "Return one specific item, uniquely identified by it's name"
@@ -151,7 +166,64 @@
 					"response": []
 				},
 				{
+					"name": "/store/<name>",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/store/{{store_name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"store",
+								"{{store_name}}"
+							]
+						},
+						"description": "Return one specific item, uniquely identified by it's name"
+					},
+					"response": []
+				},
+				{
+					"name": "items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"items"
+							]
+						},
+						"description": "Return a list of items in JSON format"
+					},
+					"response": []
+				},
+				{
 					"name": "/item/<name>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"tests[\"Item name is present\"] = jsonData.name !== undefined;\r",
+									"\r",
+									"pm.environment.set(\"item_name\", jsonData.name);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -163,16 +235,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"price\": 15.99,\r\n    \"store_id\": 1\r\n}"
+							"raw": "{\r\n    \"price\": 15.99,\r\n    \"store_id\": {{store_id}},\r\n    \"quantity\": 5\r\n}"
 						},
 						"url": {
-							"raw": "{{url}}/item/table",
+							"raw": "{{url}}/item/piano3",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"item",
-								"table"
+								"piano3"
 							]
 						},
 						"description": "Return one specific item, uniquely identified by it's name"
@@ -180,25 +252,42 @@
 					"response": []
 				},
 				{
+					"name": "items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"items"
+							]
+						},
+						"description": "Return a list of items in JSON format"
+					},
+					"response": []
+				},
+				{
 					"name": "/item/<name>",
 					"request": {
-						"method": "DELETE",
+						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text",
-								"disabled": true
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "{{url}}/item/<name>",
+							"raw": "{{url}}/item/{{item_name}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"item",
-								"<name>"
+								"{{item_name}}"
 							]
 						},
 						"description": "Return one specific item, uniquely identified by it's name"
@@ -218,16 +307,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"price\": 15.99\r\n}"
+							"raw": "{\r\n    \"price\": 150.99,\r\n    \"store_id\": {{store_id}}\r\n}"
 						},
 						"url": {
-							"raw": "{{url}}/item/<name>",
+							"raw": "{{url}}/item/{{item_name}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"item",
-								"<name>"
+								"{{item_name}}"
 							]
 						},
 						"description": "Return one specific item, uniquely identified by it's name"
@@ -235,70 +324,153 @@
 					"response": []
 				},
 				{
-					"name": "/login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = JSON.parse(responseBody);\r",
-									"tests[\"access_token is present\"] = jsonData.access_token !== undefined;\r",
-									"\r",
-									"pm.environment.set(\"jwt_token\", jsonData.access_token);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
+					"name": "/item/<name>",
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json",
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"yk\",\r\n    \"password\": \"asdf\"\r\n}"
-						},
 						"url": {
-							"raw": "{{url}}/login",
+							"raw": "{{url}}/item/{{item_name}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"login"
+								"item",
+								"{{item_name}}"
 							]
-						}
+						},
+						"description": "Return one specific item, uniquely identified by it's name"
 					},
 					"response": []
 				},
 				{
-					"name": "/register",
+					"name": "/item/<name>",
 					"request": {
-						"method": "POST",
+						"method": "DELETE",
 						"header": [
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"type": "text"
+								"type": "text",
+								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"yk\",\r\n    \"password\": \"asdf\"\r\n}"
-						},
 						"url": {
-							"raw": "{{url}}/register",
+							"raw": "{{url}}/item/{{item_name}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"register"
+								"item",
+								"{{item_name}}"
 							]
-						}
+						},
+						"description": "Return one specific item, uniquely identified by it's name"
+					},
+					"response": []
+				},
+				{
+					"name": "/item/<name>",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/item/{{item_name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"item",
+								"{{item_name}}"
+							]
+						},
+						"description": "Return one specific item, uniquely identified by it's name"
+					},
+					"response": []
+				},
+				{
+					"name": "/store/<name>",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/store/{{store_name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"store",
+								"{{store_name}}"
+							]
+						},
+						"description": "Return one specific item, uniquely identified by it's name"
+					},
+					"response": []
+				},
+				{
+					"name": "/store/<name>",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/store/{{store_name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"store",
+								"{{store_name}}"
+							]
+						},
+						"description": "Return one specific item, uniquely identified by it's name"
+					},
+					"response": []
+				},
+				{
+					"name": "/store/<name>",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/store/{{store_name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"store",
+								"{{store_name}}"
+							]
+						},
+						"description": "Return one specific item, uniquely identified by it's name"
 					},
 					"response": []
 				}
