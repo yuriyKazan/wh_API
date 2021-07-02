@@ -1,4 +1,3 @@
-from flask_jwt import jwt_required
 from flask_restful import Resource, reqparse
 
 from models.user import UserModel
@@ -15,7 +14,6 @@ class UserRegister(Resource):
                         required=True,
                         help='The field can\'t be empty')
 
-    @jwt_required()
     def post(self):
         data = UserRegister.parser.parse_args()
 
