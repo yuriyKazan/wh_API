@@ -16,7 +16,7 @@ class Store(Resource):
         store = StoreModel(name)
         try:
             store.save_to_db()
-        except:
+        except ValueError():
             return {"message": "An error occurred creating the store."}, 500
 
         return store.json(), 201
@@ -26,10 +26,10 @@ class Store(Resource):
         if store:
             store.delete_from_db()
         else:
-            return {'message': 'The item was not find'}
+            return {'message': 'The store was not find'}
         return {'message': 'The store deleted'}, 202
 
 
 class StoreList(Resource):
     def get(self):
-        return {'stores': list(map(lambda x: x.json(), StoreModel.query.all()))}
+        return {'stores': [store.json() for store in StoreModel.query.all()]}

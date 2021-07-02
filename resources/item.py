@@ -55,7 +55,6 @@ class Item(Resource):
             item = ItemModel(name, **data)
         else:
             item.price = data['price']
-            item.store_id = data['store_id']
             if data['quantity']:
                 item.quantity = data['quantity']
             else:
